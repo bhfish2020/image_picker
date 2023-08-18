@@ -7,7 +7,8 @@ import '../utils/app_constants.dart';
 
 final clientProvider = Provider((ref) => Dio(
     BaseOptions(
-        baseUrl: AppConstants.BASE_URL)
+        baseUrl: AppConstants.BASE_URL
+    )
 )
 );
 
@@ -23,8 +24,8 @@ Provider<RepositoryAPI>((ref) => RepositoryAPI(ref));
 
 
 abstract class Repository {
-  Future<List<JobModel>> getJobData();
-  Future<dynamic> post(String path,Map body);
+  Future<dynamic> get(String path, Map<String,dynamic> queryParameters);
+  Future<dynamic> post(String path,Map<String,dynamic> body, Map<String,dynamic> queryParameters);
 }
 
 
@@ -32,6 +33,21 @@ abstract class Repository {
 class RepositoryAPI implements Repository{
   final Ref ref;
   RepositoryAPI(this.ref);
+
+  @override
+  Future<dynamic> get(String path, Map<String,dynamic> queryParameters) async{
+    try{
+      Options requestOptions = Options();
+      ref.watch(clientProvider).options.headers = {
+        "Host": AppConstants.BASE_URL.toString().replaceAll("http://", ""),
+      };
+      ref.watch(clientProvider).options.queryParameters = queryParameters;
+      final response = await ref.watch(clientProvider).get(path);
+      return response.data['data'];
+    } on DioException catch (errorMessage) {
+      throw Exception(errorMessage);
+    }
+  }
 
 
   ///FIXME: THIS IS AN EXAMPLE POST METHOD WITH DIO
@@ -50,27 +66,30 @@ class RepositoryAPI implements Repository{
 
 
   @override
-  Future<dynamic> post(String path,Map body) async{
+  Future<dynamic> post(String path,Map<String,dynamic> body, Map<String,dynamic> queryParameters) async{
 
     try{
       /**
        *
        * testing headers:: Learned about the importance of content length in headers
        */
-
-      Options requestOptions = Options();
       ref.watch(clientProvider).options.headers = {
         "content-Type": "application/json",
         "host": AppConstants.BASE_URL.toString().replaceAll("http://", ""),
-        "content-Length": (jsonEncode(body).replaceAll(" ", "")).toString(),
+        "content-Length": (jsonEncode(body).replaceAll(" ", "")).length.toString(),
       };
-      requestOptions.headers = requestOptions.headers ?? {};
-      print(requestOptions.headers);
       print(ref.watch(clientProvider).options.headers);
       print("passed header test");
       /**
        *
        * Post Request
+       *
+       */
+      ref.watch(clientProvider).options.queryParameters = queryParameters;
+      /**
+       *
+       *adding on query parameters( if any )
+       *
        *
        */
       final response = await ref.watch(clientProvider).post(
@@ -79,7 +98,7 @@ class RepositoryAPI implements Repository{
       );
       /**
        *
-       *
+       *Execute post request
        *
        */
       print("passed post method");
@@ -104,17 +123,17 @@ class RepositoryAPI implements Repository{
 
   }
 
-  @override
-  Future<List<JobModel>> getJobData() async {
-    try {
-      final response = await ref.watch(clientProvider).get(
-          AppConstants.GET_JOB_DATA_URI);
-      final List result = jsonDecode(jsonEncode(response.data))['data'];
-      print("result from repository: ${result}");
-      return result.map((e) => JobModel.fromJson(e)).toList();
-    } on DioError catch (errorMessage) {
-      throw Exception(errorMessage);
-    }
-
-  }
+///@override
+///Future<List<JobModel>> getJobData() async {
+///  try {
+///    final response = await ref.watch(clientProvider).get(
+///        AppConstants.GET_JOB_DATA_URI);
+///    final List result = jsonDecode(jsonEncode(response.data))['data'];
+///    print("result from repository: ${result}");
+///    return result.map((e) => JobModel.fromJson(e)).toList();
+///  } on DioError catch (errorMessage) {
+///    throw Exception(errorMessage);
+///  }
+///
+///}
 }

@@ -1,9 +1,9 @@
 
 class AppConstants{
-  static const String APP_NAME = "image_picker_example";// name of app
+  static const String APP_NAME = "histology_app";// name of app
   static const int APP_VERSION = 1;
 
-  static const String BASE_URL = "http://asdf-env.eba-eemi8fuw.us-east-2.elasticbeanstalk.com";
+  static const String BASE_URL = "http://histology-app.us-east-2.elasticbeanstalk.com";
 
   ///user endpoints
   static const String REGISTER_URI = "/api/register";
@@ -12,9 +12,13 @@ class AppConstants{
   ///
   ///
   /// Get data endpoints
-  static const String GET_POST_DATA_URI = "/api/getPostData";
-  static const String GET_JOB_DATA_URI = "/api/get-jobs";
+  static const String TEST = "/api/form/test";
+  static const String POST_TEST = "/api/form/post-test";
   static const String ACCOUNT_DATA_URI = "/api/getAccountData";
+  static const String POST_FORM = "/api/form/store-form-data";
+  static const String GET_FORM = "/api/form/get-form-data";
+  static const String GET_LIST_OF_FORMS = "/api/form/get-list-of-forms";
+  static const String SEND_IMAGE = "/api/images/store-image";
   /// Get data endpoints
 
   static const String NAME = "name";

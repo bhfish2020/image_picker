@@ -24,7 +24,7 @@ class HomePage extends ConsumerWidget {
   List pages = [
     MyHomePage(),
     ImagePickerButton(),
-    ThirdPage(),
+    Image1(),
   ];
   @override
   Widget build(BuildContext context, WidgetRef ref) {

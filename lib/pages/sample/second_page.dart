@@ -138,7 +138,7 @@ class _ImageState extends ConsumerState<Image1> {
         ElevatedButton(onPressed: () async{
           await ref.watch(postImageProvider).then((value) {
             setState(() {
-              imageFileUrl = value.toString();
+              imageFileUrl = value['url'].toString();
             });
           });
 

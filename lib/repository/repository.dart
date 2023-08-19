@@ -175,9 +175,9 @@ class RepositoryAPI implements Repository{
           *
           */
          print("passed post method");
-         String temporaryUrlString = response.data;
+         Map<String,dynamic> temporaryUrlMap = response.data;
 
-         return temporaryUrlString;
+         return temporaryUrlMap;
        } on DioError catch (errorMessage) {
          throw Exception(errorMessage);
        }

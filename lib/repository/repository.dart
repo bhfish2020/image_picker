@@ -26,6 +26,7 @@ Provider<RepositoryAPI>((ref) => RepositoryAPI(ref));
 abstract class Repository {
   Future<dynamic> get(String path, Map<String,dynamic> queryParameters);
   Future<dynamic> post(String path,Map<String,dynamic> body, Map<String,dynamic> queryParameters);
+  Future<dynamic> postFormData(String path,FormData body, Map<String,dynamic> queryParameters);
 }
 
 
@@ -136,4 +137,49 @@ class RepositoryAPI implements Repository{
 ///  }
 ///
 ///}
+///
+     @override
+  Future postFormData(String path, FormData body, Map<String, dynamic> queryParameters) async{
+
+       try{
+         /**
+          *
+          * testing headers:: Learned about the importance of content length in headers
+          */
+         ref.watch(clientProvider).options.headers = {
+           "content-Type": "application/json",
+           "host": AppConstants.BASE_URL.toString().replaceAll("http://", ""),
+           "content-Length": body.length.toString(),
+         };
+         print(ref.watch(clientProvider).options.headers);
+         print("passed header test");
+         /**
+          *
+          * Post Request
+          *
+          */
+         ref.watch(clientProvider).options.queryParameters = queryParameters;
+         /**
+          *
+          *adding on query parameters( if any )
+          *
+          *
+          */
+         final response = await ref.watch(clientProvider).post(
+           path,
+           data: body,
+         );
+         /**
+          *
+          *Execute post request
+          *
+          */
+         print("passed post method");
+         String temporaryUrlString = response.data;
+
+         return temporaryUrlString;
+       } on DioError catch (errorMessage) {
+         throw Exception(errorMessage);
+       }
+  }
 }

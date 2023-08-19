@@ -23,7 +23,7 @@ class HomePage extends ConsumerWidget {
 
   List pages = [
     MyHomePage(),
-    ImagePickerButton(),
+    Container(),
     Image1(),
   ];
   @override

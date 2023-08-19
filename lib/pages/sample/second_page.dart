@@ -90,6 +90,7 @@ Future<void> _pickImage(ImageSource source, WidgetRef ref) async {
   if (pickedFile != null) {
     ref.watch(imageFileProvider.notifier).setImageFile(pickedFile);
   }
+
 }
 
 
@@ -102,8 +103,22 @@ class _ImageState extends ConsumerState<Image1> {
 
     return Column(
       children: [
+        ///ref.watch(imageFileProvider)?.path != null
+        ///    ? Container(height:200, child: Image.file(File(ref.watch(imageFileProvider)!.path)))
+        ///    : Placeholder(
+        ///  fallbackHeight: 200,
+        ///  fallbackWidth: double.infinity,
+        ///),
         ref.watch(imageFileProvider)?.path != null
-            ? Container(height:200, child: Image.file(File(ref.watch(imageFileProvider)!.path)))
+            ? imageFileUrl!=null?Container(
+              height: 200,
+              child: Image(image: NetworkImage(imageFileUrl!),),
+            ):Container(
+              height: 200,
+              child: Center(
+                  child: CircularProgressIndicator()
+              )
+          )
             : Placeholder(
           fallbackHeight: 200,
           fallbackWidth: double.infinity,
@@ -116,16 +131,26 @@ class _ImageState extends ConsumerState<Image1> {
                 title: Text("Choose an Image"),
                 actions: [
                   TextButton(
-                    onPressed: () {
+                    onPressed: () async{
                       Navigator.of(context).pop();
-                      _pickImage(ImageSource.gallery, ref);
+                      await _pickImage(ImageSource.gallery, ref);
+                      await ref.watch(postImageProvider).then((value) {
+                        setState(() {
+                          imageFileUrl = value['url'].toString();
+                        });
+                      });
                     },
                     child: Text("Gallery"),
                   ),
                   TextButton(
-                    onPressed: () {
+                    onPressed: () async {
                       Navigator.of(context).pop();
-                      _pickImage(ImageSource.camera, ref);
+                      await _pickImage(ImageSource.camera, ref);
+                      await ref.watch(postImageProvider).then((value) {
+                        setState(() {
+                          imageFileUrl = value['url'].toString();
+                        });
+                      });
                     },
                     child: Text("Camera"),
                   ),
@@ -135,21 +160,10 @@ class _ImageState extends ConsumerState<Image1> {
           },
           child: Text("Pick Image"),
         ),
-        ElevatedButton(onPressed: () async{
-          await ref.watch(postImageProvider).then((value) {
-            setState(() {
-              imageFileUrl = value['url'].toString();
-            });
-          });
 
-        }, child: Text("Send Image")),
         TextField(
           controller: TextEditingController(text: imageFileUrl ?? "No Image Sent"),
         ),
-        imageFileUrl!=null?Container(
-          height: 200,
-          child: Image(image: NetworkImage(imageFileUrl!),),
-        ):Container()
       ],
     );
   }
